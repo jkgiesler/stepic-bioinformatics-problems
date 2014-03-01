@@ -1,13 +1,13 @@
 """
 Written by Jason Giesler 
 Stepic.org/Bioinformatics Chapter 1:
-Reverse Complement and Finding start of substring
+Small Scripts from Chapter 1
 Started on 1/26/14
 Will implement in C++ for practice
 """
-
-genome=""
-patter="CTTGATCAT"
+#########################
+###Reverse Complement####
+#########################
 
 def revcomp(seq):
     """this takes a given sequence and returns the reverse complement"""
@@ -18,16 +18,10 @@ def revcomp(seq):
     trantab=str.maketrans(intab,outtab)
     seq=seq.translate(trantab)
     return seq
-    
-def searcher(string,search):
-    '''this function looks awefully similar to the counter function from kmer analysis but returns
-    instead the location of every start of the search string'''
-    strtlst=[]
-    for x in range(len(string)-len(search)+1):
-        if string[x:x+len(search)]==search:
-            strtlst.append(x)
-    return strtlst
 
+#########################
+########Statistics#######
+#########################
 def binarystat():
     '''this function retuns the solution of Pr(25,2,"01",1) from the 
     "Detour: Probabilities of patterns in string" section of stepic 
@@ -49,7 +43,87 @@ def binarystat():
     return result
 
 
-#z=searcher(genome,patter)
-#z=[str(i) for i in z]
-#print(" ".join(z))
+def generateallkmer(k):
+    '''returns every possible kmer given a length k'''
+    kmers=[]
+    answers=[]
+    for i in range(0,2**(2*k)):
+        binnum=bin(i)[2:]
+        if (len(binnum)<2*k):
+            binnum="0"*((2*k)-len(binnum))+binnum
+        kmers.append(binnum)
+    
+    for string in kmers:
+        totalstr=""
+        for i in range(int(len(string)/2)):
+            case=string[i]+string[i+k]
+            if case=="00":
+                totalstr+="A"
+            if case=="01":
+                totalstr+="C"
+            if case=="10":
+                totalstr+="G"
+            if case=="11":
+                totalstr+="T"
+        answers.append(totalstr)
+    return answers
 
+#########################
+####kmer searching#######
+#########################
+def importgenome(filename):
+    '''this function just lets me import the ecoli genome because I'm too lazy to
+    try copying and pasting it into the text editor'''
+    genome=open(filename,"rt")
+    bases=""
+    for line in genome:
+        bases+=line.rstrip()
+    return bases
+    
+def getkmers(seq,k):
+    '''takes a given sequence and returns all possible kmers
+        does something kind of ugly with the creation of a dictionary to get rid
+        of duplicates'''
+    possiblekmers={}
+    for i in range(len(seq)-k+1):
+        if seq[i:i+k] in possiblekmers.keys():
+            possiblekmers[seq[i:i+k]]+=1
+        else:
+            possiblekmers[seq[i:i+k]]=0
+    
+    lst=[] #optimization here hopefully will work
+    for i in possiblekmers.keys():
+        if possiblekmers[i]>1:
+            lst.append(i)
+    return lst
+
+
+
+###################
+####Skew Problems##
+###################
+
+def skew(seq):
+    '''calculates skew distance for every base in an attempt to find the oriC'''
+    seqstr=[]
+    running=0
+    seqstr.append(running)
+    for i in range(len(seq)):
+        
+        if seq[i]=="C":
+            running-=1
+        if seq[i]=="G":
+            running+=1
+        else:
+            pass
+        seqstr.append(running)
+    return seqstr
+
+def findmin(skewdat):
+    '''finds the location of the lowest skew scores'''    
+    mini=[]
+    minimum=min(skewdat)
+    for i in range(len(skewdat)):
+        if int(skewdat[i])==minimum:
+            mini.append(i)
+    return mini
