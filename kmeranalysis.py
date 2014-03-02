@@ -41,7 +41,8 @@ def printmax(seq,k):
         if counterlst[i]==maximum:
             maxlst.append(allkmer[i])
     return maxlst
-        
-print(printmax(seq,k))
+    
+
+
     
     
