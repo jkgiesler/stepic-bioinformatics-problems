@@ -5,13 +5,10 @@ Created on Fri Feb  7 15:57:51 2014
 @author: jgiesler
 mismatchtest holy shit it works... really slow
 God this needs to be cleaned up though
-"""
 
-#given a sequence
-seq="CACAGTAGGCGCCGGCACACACAGCCCCGGGCCCCGGGCCGCCCCGGGCCGGCGGCCGCCGGCGCCGGCACACCGGCACAGCCGTACCGGCACAGTAGTACCGGCCGGCCGGCACACCGGCACACCGGGTACACACCGGGGCGCACACACAGGCGGGCGCCGGGCCCCGGGCCGTACCGGGCCGCCGGCGGCCCACAGGCGCCGGCACAGTACCGGCACACACAGTAGCCCACACACAGGCGGGCGGTAGCCGGCGCACACACACACAGTAGGCGCACAGCCGCCCACACACACCGGCCGGCCGGCACAGGCGGGCGGGCGCACACACACCGGCACAGTAGTAGGCGGCCGGCGCACAGCC"
-d=2
-k=10
-import itertools
+this is the only kmer analysis function which can be absolutely
+accurate. it is the brute force method.
+"""
 
 def generateallkmer(k):
     '''returns every possible kmer given a length k'''
@@ -65,9 +62,31 @@ def printmax(seq,k,d):
     maximum=max(counterlst) #get most common kmer
     #now look for all kmers which have the maximum name
     maxlst=[]
+    print(maximum)
     for i in range (len(counterlst)):
         if counterlst[i]==maximum:
             maxlst.append(allkmer[i])
     return maxlst
 
-print(printmax(seq,k,d))
+#####stuff for accuracy testing########
+
+d=3
+k=9
+import itertools
+
+
+filein=open("testcases.txt","rt")
+fileout=open("geratedsol.txt","wt")
+sequences=[]
+answers=[]
+for line in filein:
+	line=line.rstrip()
+	sequences.append(line)
+	answers.append(printmax(line,k,d))
+
+filein.close()
+
+for i in range(len(sequences)):
+	print(answers[i],file=fileout)
+
+fileout.close()
