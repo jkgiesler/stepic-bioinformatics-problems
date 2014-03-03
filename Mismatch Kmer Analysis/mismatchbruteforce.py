@@ -70,23 +70,28 @@ def printmax(seq,k,d):
 
 #####stuff for accuracy testing########
 
-d=3
-k=9
 import itertools
 
 
-filein=open("testcases.txt","rt")
-fileout=open("geratedsol.txt","wt")
-sequences=[]
-answers=[]
-for line in filein:
-	line=line.rstrip()
-	sequences.append(line)
-	answers.append(printmax(line,k,d))
+k=10
+d=2
 
-filein.close()
+print(printmax("TAGGACGGTAGGTCCTCCACGGACGGCGCTTAGGACGGTCCCCATAGGCCATCCCGCTCGCTCGCTCGCTCCACGCTCCACGCTTCCTAGGCGCTTCCCGCTCCATCCCCATCCTAGGCCATAGGACGGACGGACGGACGGACGGTAGGTCCCGCTCGCTCCAACGGCGCTTAGGCCATAGGCGCTCGCTTAGGTAGGCCACGCTCGCTCCATCCTAGGTAGGACGGCGCTTAGGTCCTCCTCCTCCCGCTTCCACGGTAGGACGGCGCTTAGGCCACGCTTAGGACGGCGCTCCAACGGCCAACGGCCACCATCCCGCTCCATCCTAGGTAGGACGGCCACGCTTCCCCA",k,d))
 
-for i in range(len(sequences)):
-	print(answers[i],file=fileout)
 
-fileout.close()
+
+#filein=open("testcases.txt","rt")
+#fileout=open("geratedsol.txt","wt")
+#sequences=[]
+#answers=[]
+#for line in filein:
+	#line=line.rstrip()
+	#sequences.append(line)
+	#answers.append(printmax(line,k,d))
+
+#filein.close()
+
+#for i in range(len(sequences)):
+	#print(answers[i],file=fileout)
+
+#fileout.close()

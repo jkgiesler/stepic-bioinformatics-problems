@@ -21,6 +21,17 @@ def generateallkmer(k):
         lst.append(("".join(i)))
         
     return lst
+
+def revcomp(seq):
+    """this takes a given sequence and returns the reverse complement"""
+    seq=seq.upper()
+    seq=seq[::-1]
+    intab="ACTG"
+    outtab="TGAC"
+    trantab=str.maketrans(intab,outtab)
+    seq=seq.translate(trantab)
+    return seq
+
 def scoring(testseq,kmer,d):
     '''this function is used as a logical test to see whether
     or not the test seq is within an acceptable distance of
@@ -83,7 +94,7 @@ def massmutate(base,d):
     z=mutatebase(base)    
     for i in range(d-1): 
         z=[mutatebase(i) for i in z]
-        z=sum(z,[])
+        z= list(itertools.chain.from_iterable(z))
     return z
 
 def printmax(seq,k,d):	
@@ -101,11 +112,11 @@ def printmax(seq,k,d):
 	counterlst=[]
 	allkmer=list(dictr.keys())
 
-	tot=len(allkmer)
+	tot =len(allkmer)
 	cnt=0
 	#count occurance of all kmers
 	for i in allkmer:
-		counterlst.append(counter(seq,i,d))
+		counterlst.append(counter(seq,i,d)+counter(revcomp(seq),i,d))
 		cnt += 1
 		print(cnt/tot)
 
@@ -126,22 +137,26 @@ def printmax(seq,k,d):
 ####stuff for accuracy testing######
 import itertools
 import time
-k=9
+k=10
 d=3
-#print(printmax(seq,k,d))
-filein=open("testcases.txt","rt")
-answers=[]
-sequences=[]
-for line in filein:
-	line=line.rstrip()
-	sequences.append(line)
-	answers.append(printmax(line,k,d))
+
+print(printmax("TTTTCATTTTTTTCCCTTTTCATCATCCCCCCCATCCCTTTTTTTTCATTTTTTTTTCCCTTCATTTTTCATTTTTTTCATCATTTCATTTTTTTTTCATTTTTTTTTTTCCCTTCCCTTTTCATTTTTTTTTTTTTTTCCCCATTTTTCCCCCCCATTTTTTTCATTTTTTTTTTTTTTTTTCATTTTTTTTTCATCATTTTTTTTTTTTTCAT",k,d))
+
+
+##print(printmax(seq,k,d))
+#filein=open("testcases.txt","rt")
+#answers=[]
+#sequences=[]
+#for line in filein:
+	#line=line.rstrip()
+	#sequences.append(line)
+	#answers.append(printmax(line,k,d))
 	
-filein.close()
+#filein.close()
 
-fileout=open("newgensol.txt","wt")
+#fileout=open("newgensol.txt","wt")
 
-for i in answers:
-	print(i,file=fileout)
+#for i in answers:
+	#print(i,file=fileout)
 
-fileout.close()
+#fileout.close()
