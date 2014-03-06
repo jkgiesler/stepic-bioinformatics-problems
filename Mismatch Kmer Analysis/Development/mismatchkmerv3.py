@@ -20,13 +20,13 @@ Further testing is required.
     #for i in seq:
         #lst.append(("".join(i)))
         
-    return lst
+    #return lst
 def scoring(testseq,kmer,d):
     '''this function is used as a logical test to see whether
     or not the test seq is within an acceptable distance of
     kmer'''
     count=0
-    acceptable=k-d
+    acceptable=len(testseq)-d
     for i in range(len(testseq)):
         if kmer[i]==testseq[i]:
             count+=1
@@ -105,9 +105,9 @@ def printmax(seq,k,d):
 	cnt=0
 	#count occurance of all kmers
 	for i in allkmer:
-		counterlst.append(counter(seq,i,d))
+		counterlst.append(counter(seq,i,d))                
 		cnt += 1
-		print(cnt/tot)
+		print(counter(seq,i,d))
 
 	#whats the max?
 	maximum=max(counterlst)
@@ -126,10 +126,10 @@ def printmax(seq,k,d):
 ####stuff for accuracy testing######
 import itertools
 import time
-k=10
-d=2
+k=4
+d=1
 
-print(printmax(,k,d))
+print(printmax("ACGTTGCATGTCGCATGATGCATGAGAGCT",k,d))
 
 
 ##print(printmax(seq,k,d))
