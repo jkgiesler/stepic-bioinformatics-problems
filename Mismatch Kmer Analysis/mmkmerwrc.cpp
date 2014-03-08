@@ -4,6 +4,9 @@
  * the most common kmer. it takes a little longer but it could be
  * at predicting.
  * 
+ * 
+ * making modifications to tie in w/ map distance algorithm
+ * 
  * looks like its working pretty well.. awesome!*/
 #include <iostream>
 #include <string>
@@ -12,6 +15,11 @@
 #include <cstring>
 #include <ctime>
 #include <algorithm>
+#include <fstream>
+#include <cmath>
+#include <sstream>
+#include <stdio.h>
+#include <stdlib.h>
 using namespace std; //blah blah bad practice i know. IM LAZY TODAY.
 
 
@@ -21,70 +29,44 @@ vector<string> massmutate(vector<string>); //mutates kmers 1 time
 bool closeenough(string, string, int); //checks to see if it's legit
 int counter(string,string, int); //counts shit up
 string revcomp(string); //returns the reverse complement
+void findmax(string, int, int); //prints the most frequently occuring kmer
+int skew(string); //determines probabilistic location
+
 
 int main()
 {
-	std::clock_t start;
-	double duration;
-	start = std::clock();
-	string seq;
-	seq = "AGCATATATTGTGTGATAGCAGCATATGGATGTGATGGAATGGAAGCTGATGGAATAGCGGAAGCATATAGCTGATGGAATATTGGGATGGGAATATATATTGGGAATTGAGCATAGCATAGCTGGGAATAGCTGTGATATATATATAGCAGCATTGATGGAATATATTGAGCATTGTGTGATTGGGAAGCGGAATATAGCATGGATGATATAGCTGATAGC";
+	string seq="";
+
+	//seq = "CTTGCCGGCGCCGATTATACGATCGCGGCCGCTTGCCTTCTTTATAATGCATCGGCGCCGCGATCTTGCTATATACGTACGCTTCGCTTGCATCTTGCGCGCATTACGTACTTATCGATTACTTATCTTCGATGCCGGCCGGCATATGCCGCTTTAGCATCGATCGATCGTACTTTACGCGTATAGCCGCTTCGCTTGCCGTACGCGATGCTAGCATATGCTAGCGCTAATTACTTAT";
 	int k,d;
-	k=10;
-	d=2;
+	k=9;
+	d=1;
 	
-	//not test cases
-	vector<string> kmers = getkmer(seq,d,k);
-	//vector<string> test;
-	//test.push_back("AAAA");
-	
-	for(int i=0;i<d;i++)
-	// this loop is required to mutate the kmer d times
+	string userinput;
+	cout<<"please enter filename!\n";
+	cin>>userinput;
+	string line;
+	ifstream myfile (userinput.c_str());
+	if (myfile.is_open())
 	{
-		kmers = massmutate(kmers);	
-	}
-	
-	vector<int> counts;
-	string revcompans;
-	//loop captures counts for everything
-	for(int i=0;i<(int)kmers.size();i++)
-	{
-		revcompans = revcomp(kmers[i]);
-		counts.push_back(counter(seq,kmers[i],d) + counter(seq,revcompans,d));
-	}
-		
-	vector<string> ans;
-	int max = 0;
-	for(int i=0;i<(int)counts.size();i++) //loop to get max value
-	{ 
-		if(counts[i]>max)
+		while ( getline (myfile, line) )
 		{
-			max = counts[i];
+		  seq = seq+line;
 		}
 	}
+	else cout<<"cant open file! \n";
 	
-	for(int i=0;i<(int)counts.size();i++) //loop finds max values
-	{ 
-		if(counts[i]==max)
-		{
-			ans.push_back(kmers[i]);
-		}
-	}
+	seq= seq+seq.substr(0,((int)seq.length()/2));
+	int ans;
+	ans = skew(seq);
+	
+	
+	
+	cout<<seq.substr(ans,500)<<endl;
+	findmax(seq.substr(ans,500),k,d);
 
-	printvector(ans);
-	
-	duration = ( std::clock() - start) / (double) CLOCKS_PER_SEC;
-	
-	cout<<"Time it took"<<duration<<endl;
+
 	return 0;
-}
-
-string calcrevcomp(string)
-{
-	string revcomp;
-	
-	
-	return revcomp;
 }
 
 vector<string> getkmer(string sequence,int d,int k)
@@ -244,3 +226,101 @@ string revcomp(string bases)
 	std::reverse(rev.begin(),rev.end());
 	return rev; 
 }
+
+void findmax(string seq, int k , int d)
+{	/*this function does all the work and prints the top occuring kmer */
+	
+	std::clock_t start;
+	double duration;
+	start = std::clock();
+	vector<string> kmers = getkmer(seq,d,k);
+	
+	for(int i=0;i<d;i++)
+	// this loop is required to mutate the kmer d times
+	{
+		kmers = massmutate(kmers);	
+	}
+	
+	vector<int> counts;
+	string revcompans;
+	double times = 0;
+	double tot = 0;
+	tot= (double)kmers.size();
+	
+	//loop captures counts for everything
+	for(int i=0;i<(int)kmers.size();i++)
+	{
+		revcompans = revcomp(kmers[i]);
+		counts.push_back(counter(seq,kmers[i],d) + counter(seq,revcompans,d));
+		times++;
+		//cout<<times/tot<<endl;
+	}
+		
+	vector<string> ans;
+	int max = 0;
+	for(int i=0;i<(int)counts.size();i++) //loop to get max value
+	{ 
+		if(counts[i]>max)
+		{
+			max = counts[i];
+		}
+	}
+	
+	for(int i=0;i<(int)counts.size();i++) //loop values which equal max
+	{ 
+		if(counts[i]==max)
+		{
+			ans.push_back(kmers[i]);
+		}
+	}
+
+	printvector(ans);
+	
+	duration = ( std::clock() - start) / (double) CLOCKS_PER_SEC;
+	
+	cout<<"Time it took"<<duration<<endl;
+}
+
+int skew(string seq)
+{ /*calcualtes map distance and returns the lowester area */
+	vector<int> skewtable;
+	int running = 0;
+	
+	ofstream myfile ("output.dat");
+	if (myfile.is_open())
+	{
+		for(int i=0; i<seq.length(); i++)
+		{
+			if((char)seq[i]=='G')
+			{
+				running++;
+			}
+			else if((char)seq[i]=='C')
+			{
+				running--;
+			}
+			skewtable.push_back(running);
+			myfile<<running<<"\n";
+		}
+		myfile.close();
+		system("Rscript mapgraph.R");
+	}
+	else cout<<"Can't open file! \n";
+	int minimum =0;
+	int index=0;
+	for(int i=0; i<skewtable.size(); i++)
+	{
+		if (skewtable[i]< minimum)
+		{
+			index = i;
+			minimum = skewtable[i];
+			
+		}
+	}
+	
+	
+	return index;
+}
+
+
+
