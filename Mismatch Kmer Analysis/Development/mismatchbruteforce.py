@@ -49,7 +49,7 @@ def counter(string,search,d):
 
 def printmax(seq,k,d):
     '''this function makes sure to print only the highest scoring kmers'''
-    allkmer=generateallkmer(k)
+    
     counterlst=[]
     
     percentdone=0
